@@ -76,6 +76,8 @@ function createTicket(ticketColor, data, ticketId) {
     }
 
     handleRemoval(ticketCont, ticketId);
+    handlePriorityColor(ticketCont, ticketId);
+    handleLock(ticketCont, ticketId);
 }
 
 //getting data from localstorage, for re-rendering of tickets
@@ -143,6 +145,7 @@ removeBtn.addEventListener("click", function () {
   isRemoveBtnActive = !isRemoveBtnActive;
 });
 
+//helps in removing the ticket from frontend and saving in localstorage.
 function handleRemoval(ticketCont, id) {
     ticketCont.addEventListener("click", () => {
         if (!isRemoveBtnActive) return;
@@ -168,9 +171,64 @@ function handleRemoval(ticketCont, id) {
 //     })
 // }
 
+// return index of ticket present in ticketsArr.
 function getTicketIdx(id) {
     let idx = ticketsArr.findIndex(ticketObj => {
         return ticketObj.ticketId == id;
     })
     return idx;
+}
+
+// change the priority of the ticketColor in ticket.
+function handlePriorityColor(ticketCont, id) {
+    let ticketColor = ticketCont.querySelector(".ticket-color");
+
+    // add event listener of type click on ticket color
+    ticketColor.addEventListener("click", function() {
+        let currTicketColor = ticketColor.classList[1];
+        let currTicketColorIdx = colors.indexOf(currTicketColor);
+        let newTicketColorIdx = (currTicketColorIdx + 1) % colors.length;
+        let newTicketColor = colors[newTicketColorIdx];
+        ticketColor.classList.remove(currTicketColor);
+        ticketColor.classList.add(newTicketColor);
+
+        //update local storage
+        let ticketIdx = getTicketIdx(id);
+        // update the newTicketColor in ticketArr
+        ticketsArr[ticketIdx].ticketColor = newTicketColor;
+        // set in local storage
+        localStorage.setItem("tickets", JSON.stringify(ticketsArr));
+    })
+}
+
+// unlock class -> fa-lock-open
+let isLocked = true;
+function handleLock(ticketCont, id) {
+    let ticketLock = ticketCont.querySelector(".fa-lock");
+    ticketLock.addEventListener("click", () => {
+        let taskArea = ticketCont.querySelector(".task-area");
+        if (isLocked) {
+            // remove lock class and add lock-open class
+            ticketLock.classList.remove("fa-lock");
+            ticketLock.classList.add("fa-lock-open");
+            // make content editable
+            taskArea.setAttribute("contenteditable", "true");
+        } else {
+            // remove lock-open class and lock class
+            ticketLock.classList.remove("fa-lock-open");
+            ticketLock.classList.add("fa-lock");
+            // make content uneditable
+            taskArea.setAttribute("contenteditable", "false")
+        }
+        isLocked = !isLocked;
+        let newTicketData = taskArea.innerText;
+
+        //update local storage
+        let ticketIdx = getTicketIdx(id);
+        // update the newTicketColor in ticketArr
+        ticketsArr[ticketIdx].ticketTask = newTicketData;
+        // set in local storage
+        localStorage.setItem("tickets", JSON.stringify(ticketsArr));
+    })
+    
 }
