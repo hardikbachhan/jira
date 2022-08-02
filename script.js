@@ -104,7 +104,7 @@ for (let i = 0; i < toolBoxColors.length; i++) {
     toolBoxColors[i].addEventListener("click", () => {
         let currColor = toolBoxColors[i].classList[0];
         let filteredTickets = ticketsArr.filter(ticketObj => ticketObj.ticketColor == currColor);
-        console.log(filteredTickets);
+        // console.log(filteredTickets);
 
         // remove all tickets
         let allTickets = document.querySelectorAll(".ticket-cont");
